@@ -102,7 +102,7 @@ def mostrar_stock():
         df_stock["Salidas"] = 0
         df_stock["Stock Total"] = df_stock["Stock Inicial"]
 
-    df_stock.to_excel("repoertes/stock_actualizado.xlsx", index=False)
+    df_stock.to_excel("reportes/stock_actualizado.xlsx", index=False)
     tabla_html = df_stock.to_html(index=False)
     return render_template("stock.html", tabla=tabla_html)
 
@@ -111,10 +111,11 @@ def descargar_stock():
     if not session.get("auth"):
         return redirect("/")
     return send_file("stock_actualizado.xlsx", as_attachment=True)
-    @app.route('/descargar_historial')
+@app.route('/descargar_historial')
 def descargar_historial():
     if not session.get("auth"):
         return redirect("/")
+    return send_file("reportes/historial_movimientos.xlsx", as_attachment=True)    
 
     historial_path = "reportes/historial_movimientos.xlsx"
 
