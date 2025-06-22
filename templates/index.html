@@ -3,59 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <title>Bodega GF Monte Verde</title>
+
+    <!-- Librería del lector QR -->
     <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+
     <style>
-        body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
-        #qr-reader { width: 300px; margin: 0 auto; }
-        form { margin-top: 20px; }
-        label, input, select, button { display: block; margin: 10px auto; width: 80%; max-width: 300px; }
-        .mensaje { margin-top: 20px; font-weight: bold; }
+        /* Fondo de pantalla */
+        body{
+            margin:0;
+            padding:0;
+            font-family: Arial, sans-serif;
+            background-image:url("/static/fondo_mv.png");   /* ← tu imagen de fondo */
+            background-size:cover;
+            background-position:center;
+            background-repeat:no-repeat;
+            background-attachment:fixed;
+            text-align:center;
+        }
+
+        /* Caja semitransparente para resaltar el formulario */
+        .contenedor{
+            background:rgba(255,255,255,0.90);
+            margin: 80px auto;
+            padding:30px 40px;
+            border-radius:15px;
+            max-width:500px;
+            box-shadow:0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        /* Logo */
+        .logo{
+            max-width:200px;
+            margin-bottom:20px;
+        }
+
+        /* Lector QR */
+        #qr-reader{
+            width:300px;
+            margin:0 auto;
+        }
+
+        /* Formulario */
+        form{ margin-top:20px; }
+        label, input, select, button{
+            display:block;
+            width:90%;
+            max-width:300px;
+            margin:10px auto;
+            padding:11px;
+            border-radius:6px;
+            font-size:16px;
+        }
+        input, select{ border:1px solid #ccc; }
+        button{
+            background:#2d572c;
+            color:#fff;
+            border:none;
+            font-weight:bold;
+            cursor:pointer;
+        }
+        button:hover{ background:#244722; }
+
+        .mensaje{ margin-top:20px;font-weight:bold; }
     </style>
 </head>
+
 <body>
-    <h1>Bodega GF Monte Verde</h1>
+    <div class="contenedor">
+        <!-- Logo -->
+        <img src="/static/MV_Logo.png" alt="Logo Monte Verde" class="logo">
 
-    <div id="qr-reader"></div>
+        <h1>Bodega GF Monte Verde</h1>
 
-    <form method="POST" id="movForm">
-        <label for="codigo">Código (escanea o escribe manualmente):</label>
-        <input type="text" id="codigo" name="codigo" required placeholder="Ej: 123456">
+        <!-- Lector QR -->
+        <div id="qr-reader"></div>
 
-        <label for="tipo">Tipo de movimiento:</label>
-        <select name="tipo" id="tipo">
-            <option value="entrada">Entrada</option>
-            <option value="salida">Salida</option>
-        </select>
+        <!-- Formulario -->
+        <form method="POST" id="movForm">
+            <label for="codigo">Código (escanea o escribe manualmente):</label>
+            <input type="text" id="codigo" name="codigo" required placeholder="Ej: 123456">
 
-        <label for="cantidad">Cantidad:</label>
-        <input type="number" name="cantidad" id="cantidad" required min="1" placeholder="Ej: 25">
+            <label for="tipo">Tipo de movimiento:</label>
+            <select name="tipo" id="tipo">
+                <option value="entrada">Entrada</option>
+                <option value="salida">Salida</option>
+            </select>
 
-        <button type="submit">Registrar movimiento</button>
-    </form>
+            <label for="cantidad">Cantidad:</label>
+            <input type="number" name="cantidad" id="cantidad" required min="1" placeholder="Ej: 25">
 
-    {% if mensaje %}
-        <div class="mensaje">{{ mensaje }}</div>
-    {% endif %}
+            <button type="submit">Registrar movimiento</button>
+        </form>
 
+        {% if mensaje %}
+            <div class="mensaje">{{ mensaje }}</div>
+        {% endif %}
+    </div>
+
+    <!-- Script de inicio de la cámara -->
     <script>
-        function iniciarCamara() {
+        function iniciarCamara(){
             const qrScanner = new Html5Qrcode("qr-reader");
             qrScanner.start(
-                { facingMode: "environment" },
-                { fps: 10, qrbox: 250 },
-                (decodedText) => {
-                    document.getElementById("codigo").value = decodedText;
-                },
-                (error) => {
-                    console.log("Error escaneando:", error);
-                }
-            ).catch(err => {
-                document.getElementById("qr-reader").innerText = "🚫 Cámara no disponible o acceso denegado.";
+                { facingMode:"environment" },
+                { fps:10, qrbox:250 },
+                decodedText => { document.getElementById("codigo").value = decodedText; },
+                error => { console.log("Error escaneando:", error); }
+            ).catch(err=>{
+                document.getElementById("qr-reader").innerText =
+                    "🚫 Cámara no disponible o acceso denegado.";
                 console.error("Error al iniciar cámara:", err);
             });
         }
-
         window.addEventListener("load", iniciarCamara);
     </script>
 </body>
 </html>
+

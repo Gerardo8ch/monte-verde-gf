@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, redirect, send_file, session
 import pandas as pd
 import os
 from datetime import datetime
+import re
+
 
 app = Flask(__name__)
 app.secret_key = "clave-secreta-supersegura"  # Clave para mantener la sesión activa
@@ -32,7 +34,9 @@ def index():
         return redirect("/")
     mensaje = ""
     if request.method == "POST":
-        codigo = request.form["codigo"].strip().upper()
+        codigo_crudo = request.form["codigo"].strip().upper()
+        codigo = re.findall(r'\d+', codigo_crudo)
+        codigo = codigo[0] if codigo else ""
         tipo = request.form["tipo"]
         cantidad = int(request.form["cantidad"])
 
