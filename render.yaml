@@ -1,0 +1,10 @@
+services:
+  - type: web
+    name: monte-verde-gf
+    env: python
+    buildCommand: ""
+    startCommand: python app.py
+    plan: free
+    region: oregon
+    branch: main
+    rootDir: .

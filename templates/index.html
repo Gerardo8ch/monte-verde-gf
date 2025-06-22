@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Bodega GF Monte Verde</title>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; text-align: center; }
+        #qr-reader { width: 300px; margin: 0 auto; }
+        form { margin-top: 20px; }
+        label, input, select, button { display: block; margin: 10px auto; width: 80%; max-width: 300px; }
+        .mensaje { margin-top: 20px; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>Bodega GF Monte Verde</h1>
+
+    <div id="qr-reader"></div>
+
+    <form method="POST" id="movForm">
+        <label for="codigo">Código (escanea o escribe manualmente):</label>
+        <input type="text" id="codigo" name="codigo" required placeholder="Ej: 123456">
+
+        <label for="tipo">Tipo de movimiento:</label>
+        <select name="tipo" id="tipo">
+            <option value="entrada">Entrada</option>
+            <option value="salida">Salida</option>
+        </select>
+
+        <label for="cantidad">Cantidad:</label>
+        <input type="number" name="cantidad" id="cantidad" required min="1" placeholder="Ej: 25">
+
+        <button type="submit">Registrar movimiento</button>
+    </form>
+
+    {% if mensaje %}
+        <div class="mensaje">{{ mensaje }}</div>
+    {% endif %}
+
+    <script>
+        function iniciarCamara() {
+            const qrScanner = new Html5Qrcode("qr-reader");
+            qrScanner.start(
+                { facingMode: "environment" },
+                { fps: 10, qrbox: 250 },
+                (decodedText) => {
+                    document.getElementById("codigo").value = decodedText;
+                },
+                (error) => {
+                    console.log("Error escaneando:", error);
+                }
+            ).catch(err => {
+                document.getElementById("qr-reader").innerText = "🚫 Cámara no disponible o acceso denegado.";
+                console.error("Error al iniciar cámara:", err);
+            });
+        }
+
+        window.addEventListener("load", iniciarCamara);
+    </script>
+</body>
+</html>
