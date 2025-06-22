@@ -13,7 +13,7 @@ MOVIMIENTOS_PATH = "movimientos.xlsx"
 # Cargar productos al inicio
 df_productos = pd.read_excel(PRODUCTOS_PATH, usecols="A:B")
 df_productos.rename(columns={"KOPR": "Código", "NOKOPR": "Producto"}, inplace=True)
-codigos_validos = df_productos["Código"].astype(str).tolist()
+codigos_validos = df_productos["Código"].astype(str).str.strip().str.upper().tolist()
 
 @app.route('/', methods=["GET", "POST"])
 def login():
@@ -32,7 +32,7 @@ def index():
         return redirect("/")
     mensaje = ""
     if request.method == "POST":
-        codigo = request.form["codigo"].strip()
+        codigo = request.form["codigo"].strip().upper()
         tipo = request.form["tipo"]
         cantidad = int(request.form["cantidad"])
 
