@@ -12,7 +12,7 @@ MOVIMIENTOS_PATH = "movimientos.xlsx"
 
 # Cargar productos al inicio
 df_productos = pd.read_excel(PRODUCTOS_PATH, usecols="A:B")
-df_productos.columns = ["Código", "Producto"]
+df_productos.rename(columns={"KOPR": "Código", "NOKOPR": "Producto"}, inplace=True)
 codigos_validos = df_productos["Código"].astype(str).tolist()
 
 @app.route('/', methods=["GET", "POST"])
