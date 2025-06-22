@@ -66,6 +66,8 @@ def index():
 
             if os.path.exists(MOVIMIENTOS_PATH):
                 df_mov = pd.read_excel(MOVIMIENTOS_PATH)
+                df_mov.to_excel("reportes/historial_movimientos.xlsx", index=False)
+                mensaje = f"✅ Movimiento registrado: {cantidad} {tipo} de {producto}"
                 df_mov = pd.concat([df_mov, nueva_fila], ignore_index=True)
             else:
                 df_mov = nueva_fila
@@ -100,7 +102,7 @@ def mostrar_stock():
         df_stock["Salidas"] = 0
         df_stock["Stock Total"] = df_stock["Stock Inicial"]
 
-    df_stock.to_excel("stock_actualizado.xlsx", index=False)
+    df_stock.to_excel("repoertes/stock_actualizado.xlsx", index=False)
     tabla_html = df_stock.to_html(index=False)
     return render_template("stock.html", tabla=tabla_html)
 
@@ -109,6 +111,18 @@ def descargar_stock():
     if not session.get("auth"):
         return redirect("/")
     return send_file("stock_actualizado.xlsx", as_attachment=True)
+    @app.route('/descargar_historial')
+def descargar_historial():
+    if not session.get("auth"):
+        return redirect("/")
+
+    historial_path = "reportes/historial_movimientos.xlsx"
+
+    if os.path.exists(historial_path):
+        return send_file(historial_path, as_attachment=True)
+    else:
+        return "⚠️ El archivo de historial no está disponible.", 404
+
 
 if __name__ == '__main__':
     print("🚀 Servidor Monte Verde G.F en http://0.0.0.0:10000")
