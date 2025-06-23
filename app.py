@@ -10,6 +10,11 @@ ACCESS_CODE = "mv2025"
 
 PRODUCTOS_PATH = "Productos Planta Balanceados.xlsx"
 MOVIMIENTOS_PATH = "movimientos.xlsx"
+HISTORIAL_PATH = "reportes/historial_movimientos.xlsx"
+STOCK_PATH = "reportes/stock_actualizado.xlsx"
+
+# Asegurar que la carpeta reportes existe
+os.makedirs("reportes", exist_ok=True)
 
 # Cargar productos al inicio
 df_productos = pd.read_excel(PRODUCTOS_PATH, usecols="A:D")
@@ -52,7 +57,6 @@ def index():
 
             stock_actual = stock_inicial + entradas - salidas
             nuevo_stock = stock_actual + cantidad if tipo == "entrada" else stock_actual - cantidad
-
             fecha = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
             nueva_fila = pd.DataFrame([{
@@ -66,13 +70,12 @@ def index():
 
             if os.path.exists(MOVIMIENTOS_PATH):
                 df_mov = pd.read_excel(MOVIMIENTOS_PATH)
-                df_mov.to_excel("reportes/historial_movimientos.xlsx", index=False)
-                mensaje = f"✅ Movimiento registrado: {cantidad} {tipo} de {producto}"
                 df_mov = pd.concat([df_mov, nueva_fila], ignore_index=True)
             else:
                 df_mov = nueva_fila
 
             df_mov.to_excel(MOVIMIENTOS_PATH, index=False)
+            df_mov.to_excel(HISTORIAL_PATH, index=False)
             mensaje = f"✅ {tipo.capitalize()} registrada: {cantidad} de {producto}. Stock actual: {nuevo_stock}"
 
     return render_template("index.html", mensaje=mensaje)
@@ -102,7 +105,7 @@ def mostrar_stock():
         df_stock["Salidas"] = 0
         df_stock["Stock Total"] = df_stock["Stock Inicial"]
 
-    df_stock.to_excel("reportes/stock_actualizado.xlsx", index=False)
+    df_stock.to_excel(STOCK_PATH, index=False)
     tabla_html = df_stock.to_html(index=False)
     return render_template("stock.html", tabla=tabla_html)
 
@@ -110,20 +113,16 @@ def mostrar_stock():
 def descargar_stock():
     if not session.get("auth"):
         return redirect("/")
-    return send_file("stock_actualizado.xlsx", as_attachment=True)
+    return send_file(STOCK_PATH, as_attachment=True)
+
 @app.route('/descargar_historial')
 def descargar_historial():
     if not session.get("auth"):
         return redirect("/")
-    return send_file("reportes/historial_movimientos.xlsx", as_attachment=True)    
-
-    historial_path = "reportes/historial_movimientos.xlsx"
-
-    if os.path.exists(historial_path):
-        return send_file(historial_path, as_attachment=True)
+    if os.path.exists(HISTORIAL_PATH):
+        return send_file(HISTORIAL_PATH, as_attachment=True)
     else:
         return "⚠️ El archivo de historial no está disponible.", 404
-
 
 if __name__ == '__main__':
     print("🚀 Servidor Monte Verde G.F en http://0.0.0.0:10000")
